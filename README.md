@@ -1,2 +1,2 @@
-# software-radio
+# Software Radio
 Embedded Software Defined Radio
