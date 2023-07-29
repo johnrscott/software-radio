@@ -14,10 +14,10 @@ First, install some prerequisites:
 sudo apt-get install git wget cmake flex bison gperf python3 python3-venv ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
 ```
 
-Next, download the ESP-IDF repository (IDF stands for IOT Development Framework). You can put this anywhere (the final installed location will be ~/.espressif)
+Next, download the ESP-IDF repository (IDF stands for IOT Development Framework). You can put this anywhere (the final installed location will be `~/.espressif`)
 
 ```bash
-cd ~/opt/
+mkdir -p ~/opt && cd ~/opt
 git clone --recursive https://github.com/espressif/esp-idf.git
 ```
 
@@ -37,10 +37,10 @@ python3 tools/idf_tools.py install
 
 If you forget to do this, there is no issue -- you will get an error like `ERROR: tool esp32ulp-elf has no installed versions. [...]` when you attempt to source the tools in a later step. At that point, you can run the script above to fix the issue.
 
-Each time you want to use the toolchain, you will need to source some environment variables. This should not be added to the global .bashrc, in order to avoiding importing the tools into the environment every time a terminal opens. However, you can put a shortcut in the .bashrc to make it easier to run the export script. Add the following to the .bashrc
+Each time you want to use the toolchain, you will need to source some environment variables. This should not be added to the global `~/.bashrc`, in order to avoiding importing the tools into the environment every time a terminal opens. Instead, run the `export.sh` script in this folder:
 
 ```bash
-alias esp_idf='. $HOME/opt/esp-idf/export.sh'
+. export.sh
 ```
 
 After sourcing .bashrc (or reopening the terminal), run `esp_idf` to load all the required tools into the environment. If you get the line `Done! You can now compile ESP-IDF projects.` then everything worked.
@@ -101,4 +101,10 @@ Create a new project as follows:
 idf.py create-project NAME
 ```
 
-This command will make a folder called `NAME` and populate it with the necessary files.
+This command will make a folder called `NAME` and populate it with the necessary files. Run `idf.py set-target esp32c3` to set the target device. Then build and flash using:
+
+```bash
+idf.py build
+idf.py -p /dev/ttyUSB0 flash
+idf.py monitor # To open logging console. Use ctrl-] to exit
+```
