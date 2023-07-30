@@ -8,7 +8,7 @@
 #define RMT_LO_I_GPIO_NUM 8 // In-phase local oscillator output
 #define RMT_LO_Q_GPIO_NUM 8 // Quadrature local oscillator output
 
-#define DSHOT_ESC_RESOLUTION_HZ 40000000 // 40MHz resolution, DSHot protocol needs a relative high resolution
+#define TICK_FREQUENCY_HZ 40000000 
 
 
 static const char *TAG = "sdr";
@@ -24,11 +24,13 @@ void app_main(void)
         .clk_src = RMT_CLK_SRC_DEFAULT, // select a clock that can provide needed resolution
         .gpio_num = RMT_LO_I_GPIO_NUM,
         .mem_block_symbols = 64,
-        .resolution_hz = DSHOT_ESC_RESOLUTION_HZ,
+        .resolution_hz = TICK_FREQUENCY_HZ,
         .trans_queue_depth = 10, // set the number of transactions that can be pending in the background
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&tx_chan_config, &esc_chan));
 
+    
+    
     
     while (1) {
 	vTaskDelay(1000);

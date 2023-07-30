@@ -78,6 +78,22 @@ if __name__ == "__main__":
         "p_err": p_err
     })
 
-    print(df)
+    df["p_err_deg"] = df["p_err"] * 360
     
+    print("The full data for all frequencies at 1 kHz intervals:")
+    print(df)
+
+    print("Summary of the frequency and phase errors")
     print(df.describe())
+
+    print("Filtering out rows where p_err_deg != 0")
+    print("This is when n is not exactly divisible by 4")
+    df_low_error = df.loc[df.p_err_deg < 1]
+    print(df_low_error)
+
+    print("Show summary of frequency errors for these rows")
+    print(df_low_error.describe())
+
+    print("List of frequencies where p_err = 0")
+    pd.set_option("display.max_rows", None)
+    print(df_low_error[["f", "n", "f_err"]])

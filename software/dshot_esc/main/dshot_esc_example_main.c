@@ -13,7 +13,7 @@
 #if CONFIG_IDF_TARGET_ESP32H2
 #define DSHOT_ESC_RESOLUTION_HZ 32000000 // 32MHz resolution, DSHot protocol needs a relative high resolution
 #else
-#define DSHOT_ESC_RESOLUTION_HZ 40000000 // 40MHz resolution, DSHot protocol needs a relative high resolution
+#define DSHOT_ESC_RESOLUTION_HZ 80000000 // 40MHz resolution, DSHot protocol needs a relative high resolution
 #endif
 #define DSHOT_ESC_GPIO_NUM      8
 
