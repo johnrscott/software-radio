@@ -1,6 +1,6 @@
 # General Notes
 
-This document is the equivalent of the lab book for the software.
+This document is the equivalent of the lab book for the software development.
 
 ## 30/07/2023
 
@@ -37,3 +37,7 @@ idf.py build
 idf.py -p /dev/ttyUSB0 flash monitor
 ```
 That example worked fine. The RMT module is a bit more complicated than PWM, due to the need for an encoder to convert data to the right format for the RMT periperhal. Details are provided in the [RMT API page](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/rmt.html). 
+
+Started a new blank project `idf.py create-project sdr` to prototype with the RMT module. The RMT module TX works by specifying pulses as sequences of levels with durations; for example, output 1 for 3 ticks, output 0 for 2 ticks; output 1 for 10 ticks; etc. The format is 15 bits for the duration in ticks, and 1 bit for the level (the most significant bit).
+
+The get a ballpark calculation for the tick period, assume that all centre frequencies from 535 kHz to 1605 kHz should be synthesised, with max error 0.5 kHz, and for each frequency, the I and Q LO signals can be generated 90 deg apart with at most 1 deg error. The required periods (in seconds) are 1/1000n, for n = 535, ... 1605. 
