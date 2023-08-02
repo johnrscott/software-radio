@@ -8,7 +8,7 @@
 #define RMT_LO_I_GPIO_NUM 8 // In-phase local oscillator output
 #define RMT_LO_Q_GPIO_NUM 8 // Quadrature local oscillator output
 
-#define TICK_FREQUENCY_HZ 40000000 
+#define TICK_FREQUENCY_HZ 80000000 
 
 
 static const char *TAG = "sdr";

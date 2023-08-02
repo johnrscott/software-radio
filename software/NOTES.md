@@ -317,3 +317,19 @@ between them. The results show that even the maximum tick frequency of 80 MHz (s
 
 ## 02/08/2023
 
+Got a simple copy encoder working (see `sdr.c`); this allows you to just define the 16 bit period-and-bit format in a C array and then send it to the RMT module using `rmt_transmit`. The two relevant snippets are:
+
+```c
+// This is the raw 16-bit data
+uint32_t raw_rmt_data[3] = {
+	0xffff7fff, // One bit high, one bit low
+	0 // End of transmission marker
+};
+
+// Send the data (tx_config uses -1 for infinite loop)
+ESP_ERROR_CHECK(rmt_transmit(channel_handle, copy_encoder,
+				 &raw_rmt_data, sizeof(raw_rmt_data),
+				 &tx_config));
+```
+
+Verified the results on an oscilloscope. Also verified that increasing the clock frequency to 80000000 also increases the frequency of the square wave, although a quick calculation appears to show the tick frequency is 160 MHz -- probably a factor of two error somewhere (or in the measurement).
