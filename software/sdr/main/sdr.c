@@ -13,24 +13,42 @@
 
 static const char *TAG = "sdr";
 
-
 void app_main(void)
 {
     ESP_LOGI(TAG, "Started program");
 
     ESP_LOGI(TAG, "Create RMT TX channel");
-    rmt_channel_handle_t esc_chan = NULL;
+    rmt_channel_handle_t channel_handle = NULL;
     rmt_tx_channel_config_t tx_chan_config = {
-        .clk_src = RMT_CLK_SRC_DEFAULT, // select a clock that can provide needed resolution
+        .clk_src = RMT_CLK_SRC_DEFAULT,
         .gpio_num = RMT_LO_I_GPIO_NUM,
         .mem_block_symbols = 64,
         .resolution_hz = TICK_FREQUENCY_HZ,
-        .trans_queue_depth = 10, // set the number of transactions that can be pending in the background
+        .trans_queue_depth = 10,
     };
-    ESP_ERROR_CHECK(rmt_new_tx_channel(&tx_chan_config, &esc_chan));
+    ESP_ERROR_CHECK(rmt_new_tx_channel(&tx_chan_config, &channel_handle));
+
+    ESP_LOGI(TAG, "Install copy encoder");
+    rmt_encoder_handle_t copy_encoder = NULL;
+    rmt_copy_encoder_config_t encoder_config; // Currently unused argument
+    ESP_ERROR_CHECK(rmt_new_copy_encoder(&encoder_config, &copy_encoder));
 
     
-    
+    ESP_LOGI(TAG, "Enable RMT TX channel");
+    ESP_ERROR_CHECK(rmt_enable(channel_handle));
+
+    rmt_transmit_config_t tx_config = {
+        .loop_count = -1, // infinite loop
+    };
+
+    uint32_t raw_rmt_data[3] = {
+	0xffff7fff,
+	0 // End of transmission marker
+    };
+
+    ESP_ERROR_CHECK(rmt_transmit(channel_handle, copy_encoder,
+				 &raw_rmt_data, sizeof(raw_rmt_data),
+				 &tx_config)); 
     
     while (1) {
 	vTaskDelay(1000);
