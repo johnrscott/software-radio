@@ -333,3 +333,19 @@ ESP_ERROR_CHECK(rmt_transmit(channel_handle, copy_encoder,
 ```
 
 Verified the results on an oscilloscope. Also verified that increasing the clock frequency to 80000000 also increases the frequency of the square wave, although a quick calculation appears to show the tick frequency is 160 MHz -- probably a factor of two error somewhere (or in the measurement).
+
+## 03/08/2023
+
+The goal of today is to design the minimal RMT raw data that is required to encoded the in-phase and quadrature signals, and write a function to write the arrays. From a few days ago, the crucial thing is to only allow periods that are multiples of 4 ticks, so that it is possible to offset the two square waves by exactly 90 degrees. Let the period T = 4N ticks, so that the two square waves are offset by N ticks.
+
+The in-phase signal is a simple square wave, expressed by the following three 16-bit words:
+1. High, for duration 2N: { 1b'1, 15b'(2N) } (pseudo-verilog notation)
+2. Low, for duration 2N: { 1b'0, 15b'(2N) }
+3. Null-terminator: 16b'0
+
+The quadrature signal needs to be low at the start, to offset it by 90 degrees:
+1. Low, for duration N: { 0b'1, 15b'N }
+2. High, for duration 2N: { 1b'1, 15b'(2N) }
+3. Low, for duration N: { 0b'1, 15b'(N) }
+4. Null-terminator: 16b'0
+

@@ -5,11 +5,12 @@
 #include "esp_log.h"
 #include "driver/rmt_tx.h"
 
+#include "local_osc.h"
+
 #define RMT_LO_I_GPIO_NUM 8 // In-phase local oscillator output
 #define RMT_LO_Q_GPIO_NUM 8 // Quadrature local oscillator output
 
 #define TICK_FREQUENCY_HZ 80000000 
-
 
 static const char *TAG = "sdr";
 
@@ -41,15 +42,13 @@ void app_main(void)
         .loop_count = -1, // infinite loop
     };
 
-    uint32_t raw_rmt_data[3] = {
-	0xffff7fff,
-	0 // End of transmission marker
-    };
 
-    ESP_ERROR_CHECK(rmt_transmit(channel_handle, copy_encoder,
-				 &raw_rmt_data, sizeof(raw_rmt_data),
-				 &tx_config)); 
+    write_frequency(3);
     
+    /* ESP_ERROR_CHECK(rmt_transmit(channel_handle, copy_encoder, */
+    /* 				 &raw_rmt_data, sizeof(raw_rmt_data), */
+    /* 				 &tx_config));  */
+     
     while (1) {
 	vTaskDelay(1000);
     }
