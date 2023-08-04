@@ -8,10 +8,7 @@
 
 void app_main(void)
 {
-
     setup_local_osc();
-    enable_
-  
      
     while (1) {
 	vTaskDelay(1000);

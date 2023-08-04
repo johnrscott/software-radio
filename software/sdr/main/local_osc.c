@@ -3,7 +3,7 @@
 #include "esp_log.h"
 
 #define RMT_LO_I_GPIO_NUM 8 // In-phase local oscillator output
-#define RMT_LO_Q_GPIO_NUM 8 // Quadrature local oscillator output
+#define RMT_LO_Q_GPIO_NUM 9 // Quadrature local oscillator output
 
 #define TICK_FREQUENCY_HZ 80000000
 
@@ -19,7 +19,7 @@ static rmt_channel_handle_t channel_q = NULL;
 static rmt_encoder_handle_t copy_encoder = NULL;
 
 /// Only call this function while the RMT is disabled
-void write_frequency(uint16_t quarter_period_ticks) {
+static void write_frequency(uint16_t quarter_period_ticks) {
     // Set the in-phase data
     lo_i_rmt_data[0] = 0x8000 | (2*quarter_period_ticks); // 1 for 2N
     lo_i_rmt_data[1] = (2*quarter_period_ticks); // 0 for 2N
@@ -29,7 +29,7 @@ void write_frequency(uint16_t quarter_period_ticks) {
     lo_q_rmt_data[0] = quarter_period_ticks; // 0 for N
     lo_q_rmt_data[1] = 0x8000 | (2*quarter_period_ticks); // 1 for 2N
     lo_q_rmt_data[2] = quarter_period_ticks; // 0 for N
-    lo_i_rmt_data[3] = 0;
+    lo_q_rmt_data[3] = 0;
 }
 
 static void make_rmt_channel(gpio_num_t gpio_num, rmt_channel_handle_t *channel) {
@@ -37,7 +37,7 @@ static void make_rmt_channel(gpio_num_t gpio_num, rmt_channel_handle_t *channel)
     rmt_tx_channel_config_t tx_chan_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
         .gpio_num = gpio_num,
-        .mem_block_symbols = 64,
+        .mem_block_symbols = 48,
         .resolution_hz = TICK_FREQUENCY_HZ,
         .trans_queue_depth = 10,
     };
@@ -72,7 +72,13 @@ static void enable_local_osc() {
 				 &tx_config));
     ESP_ERROR_CHECK(rmt_transmit(channel_q, copy_encoder,
 				 &lo_q_rmt_data, sizeof(lo_q_rmt_data),
-				 &tx_config));    
+				 &tx_config));
+}
+
+void update_frequency(uint16_t quarter_period_ticks) {
+    disable_local_osc();
+    write_frequency(quarter_period_ticks);
+    enable_local_osc();
 }
 
 void setup_local_osc() {
@@ -84,5 +90,8 @@ void setup_local_osc() {
     ESP_LOGI(TAG, "Install copy encoder");
     setup_copy_encoder();
 
-    ESP_LOGI(TAG, "Enable RMT TX channel");    
+    ESP_LOGI(TAG, "Enable RMT TX channel");
+
+    write_frequency(0x400);
+    enable_local_osc();
 }
