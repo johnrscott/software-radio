@@ -349,3 +349,6 @@ The quadrature signal needs to be low at the start, to offset it by 90 degrees:
 3. Low, for duration N: { 0b'1, 15b'(N) }
 4. Null-terminator: 16b'0
 
+## 04/08/2023
+
+Got the first version of the in-phase and quadrature local oscillators working. The phase difference on the oscilloscope is about 100 degrees, without the channel synchronisation, so need to get that fixed next to assess whether the phase error is even in the ballpark of reasonable.
