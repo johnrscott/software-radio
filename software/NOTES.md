@@ -352,3 +352,12 @@ The quadrature signal needs to be low at the start, to offset it by 90 degrees:
 ## 04/08/2023
 
 Got the first version of the in-phase and quadrature local oscillators working. The phase difference on the oscilloscope is about 100 degrees, without the channel synchronisation, so need to get that fixed next to assess whether the phase error is even in the ballpark of reasonable.
+
+## 05/08/2023
+
+Added the channel synchronisation code. Found it improves the phase shift from 100 degrees to:
+* 89.65 degrees (at 19.6 kHz)
+* 89.44 degrees (at 312 kHz)
+* 89.10 degrees (at 1250 MHz)
+
+Currently having an issue generating higher frequencies, but I think something is probably up with the clock (should be able to use an 80 MHz tick from the datasheet, but I don't think I'm getting that).

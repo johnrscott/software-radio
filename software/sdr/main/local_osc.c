@@ -107,6 +107,6 @@ void setup_local_osc() {
 
     ESP_LOGI(TAG, "Enable RMT TX channel");
 
-    write_frequency(0x400);
+    write_frequency(0x10);
     start_local_osc();
 }
