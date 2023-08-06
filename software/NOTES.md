@@ -315,3 +315,49 @@ between them. The results show that even the maximum tick frequency of 80 MHz (s
 1017  1552000.0   52  8.723236e-03
 1018  1553000.0   52  9.361534e-03
 
+## 02/08/2023
+
+Got a simple copy encoder working (see `sdr.c`); this allows you to just define the 16 bit period-and-bit format in a C array and then send it to the RMT module using `rmt_transmit`. The two relevant snippets are:
+
+```c
+// This is the raw 16-bit data
+uint32_t raw_rmt_data[3] = {
+	0xffff7fff, // One bit high, one bit low
+	0 // End of transmission marker
+};
+
+// Send the data (tx_config uses -1 for infinite loop)
+ESP_ERROR_CHECK(rmt_transmit(channel_handle, copy_encoder,
+				 &raw_rmt_data, sizeof(raw_rmt_data),
+				 &tx_config));
+```
+
+Verified the results on an oscilloscope. Also verified that increasing the clock frequency to 80000000 also increases the frequency of the square wave, although a quick calculation appears to show the tick frequency is 160 MHz -- probably a factor of two error somewhere (or in the measurement).
+
+## 03/08/2023
+
+The goal of today is to design the minimal RMT raw data that is required to encoded the in-phase and quadrature signals, and write a function to write the arrays. From a few days ago, the crucial thing is to only allow periods that are multiples of 4 ticks, so that it is possible to offset the two square waves by exactly 90 degrees. Let the period T = 4N ticks, so that the two square waves are offset by N ticks.
+
+The in-phase signal is a simple square wave, expressed by the following three 16-bit words:
+1. High, for duration 2N: { 1b'1, 15b'(2N) } (pseudo-verilog notation)
+2. Low, for duration 2N: { 1b'0, 15b'(2N) }
+3. Null-terminator: 16b'0
+
+The quadrature signal needs to be low at the start, to offset it by 90 degrees:
+1. Low, for duration N: { 0b'1, 15b'N }
+2. High, for duration 2N: { 1b'1, 15b'(2N) }
+3. Low, for duration N: { 0b'1, 15b'(N) }
+4. Null-terminator: 16b'0
+
+## 04/08/2023
+
+Got the first version of the in-phase and quadrature local oscillators working. The phase difference on the oscilloscope is about 100 degrees, without the channel synchronisation, so need to get that fixed next to assess whether the phase error is even in the ballpark of reasonable.
+
+## 05/08/2023
+
+Added the channel synchronisation code. Found it improves the phase shift from 100 degrees to:
+* 89.65 degrees (at 19.6 kHz)
+* 89.44 degrees (at 312 kHz)
+* 89.10 degrees (at 1250 MHz)
+
+Currently having an issue generating higher frequencies, but I think something is probably up with the clock (should be able to use an 80 MHz tick from the datasheet, but I don't think I'm getting that).
