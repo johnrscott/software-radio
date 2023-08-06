@@ -1,0 +1,43 @@
+Gilbert Cell Mixer Simulation
+
+.include 2n7000.onsemi.lib
+
+* Power supply
+Vdd 1 0 DC 9
+
+* Radio frequency input
+Vrf 4 5 DC 0 AC 1
+
+* Local oscillator input
+Vlo 8 9 DC 0 AC 1
+
+* Load resistors
+R1 1 2 10k
+R2 1 3 10k
+
+* Top-left differential pair
+X1 2 4 6 2N7000
+X2 3 5 6 2N7000
+
+* Top-right differential pair
+X3 2 5 7 2N7000
+X4 3 4 7 2N7000
+
+* Bottom differential pair
+X5 6 8 10 2N7000
+X6 7 9 10 2N7000
+
+* Bias transistor and bias network
+X7 10 11 0 2N7000
+R3 1 11 22k
+R4 11 0 10k 
+
+.control
+tran 0.5u 100m 0m
+*ac dec 100 100e3 1000e3 
+run
+plot v(2)-v(3)
+plot v(11)
+.endc
+
+.end
