@@ -6,10 +6,16 @@ Gilbert Cell Mixer Simulation
 Vdd 1 0 DC 9
 
 * Radio frequency input
-Vrf 4 5 DC 0 AC 1
+Vrf 4 5 SIN(0 1 1.6Meg)
 
 * Local oscillator input
-Vlo 8 9 DC 0 AC 1
+Vlo 8 9 SIN(0 1 1.0Meg)
+
+* Bias for LO input
+Vbias_lo 5 0 DC 6
+
+* Bias for RF input
+Vbias_rf 9 0 DC 4
 
 * Load resistors
 R1 1 2 10k
@@ -27,17 +33,18 @@ X4 3 4 7 2N7000
 X5 6 8 10 2N7000
 X6 7 9 10 2N7000
 
-* Bias transistor and bias network
+* Bias transistor and bias voltage
 X7 10 11 0 2N7000
-R3 1 11 22k
-R4 11 0 10k 
+Vbias 11 0 DC 3.3
 
 .control
-tran 0.5u 100m 0m
+tran 0.01u 10u 0u
 *ac dec 100 100e3 1000e3 
 run
 plot v(2)-v(3)
 plot v(11)
+plot v(4)
+plot v(8)
 .endc
 
 .end
